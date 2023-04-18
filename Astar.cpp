@@ -19,13 +19,13 @@ public:
         return name;
     }
     //노드간 비교를 위한 == 오버로딩
-    bool operator==(const Node& other) const {                  
+    bool operator==(const Node& other) const {
         return name == other.name && x == other.x && y == other.y;
     }
 };
 
 //노드 이름 출력을 위한 << 오버로딩
-std::ostream& operator<<(std::ostream& os, const Node& node) { 
+std::ostream& operator<<(std::ostream& os, const Node& node) {
     os << node.name;
     return os;
 }
@@ -49,12 +49,12 @@ public:
     std::vector<Edge> edges;
 
     //AddNode를 통해 노드를 그래프에 추가
-    void AddNode(const std::string& name, int x, int y) {       
+    void AddNode(const std::string& name, int x, int y) {
         nodes.push_back(Node(name, x, y));
     }
 
     //그래프 내에 특정 이름의 노드가 있는지 확인하는 FindNode 메소드
-    Node FindNode(const std::string& name) {                   
+    Node FindNode(const std::string& name) {
         for (const Node& node : nodes) {
             if (node.name == name) {
                 return node;
@@ -65,7 +65,7 @@ public:
 
     //AddEdge를 통해 엣지를 그래프에 추가. 매개변수인 양쪽 노드가 그래프에 들어가있지 않는 경우 자동으로 AddNode를 해준다.
     void AddEdge(const std::string& node1Name, int node1X, int node1Y, const std::string& node2Name, int node2X, int node2Y, int weight, const std::string& type, const std::string& edgeAttribute) {
-        
+
         if (!NodeExists(node1Name)) {
             AddNode(node1Name, node1X, node1Y);
         }
@@ -78,7 +78,7 @@ public:
     }
 
     //그래프 내에 노드를 저장해둔 nodes 벡터에서 특정 이름을 가진 노드를 찾아 그 인덱스를 반환하는 FindNodeIndex 메소드
-    int FindNodeIndex(const std::vector<Node>& nodes, const std::string& targetNodeName) { 
+    int FindNodeIndex(const std::vector<Node>& nodes, const std::string& targetNodeName) {
         for (size_t i = 0; i < nodes.size(); ++i) {
             if (nodes[i].GetName() == targetNodeName) {
                 return static_cast<int>(i);
@@ -88,7 +88,7 @@ public:
     }
 
     //그래프 내에 특정 특성을 가진 엣지들을 제외한 그래프를 생성하여 반환하는 ExcludeEdgesByType 메소드
-    Graph ExcludeEdgesByType(const std::string& type) { 
+    Graph ExcludeEdgesByType(const std::string& type) {
         Graph newGraph;
         newGraph.nodes = nodes;
 
@@ -102,7 +102,7 @@ public:
     }
 
     //그래프 내에 차도가 아닌 엣지들을 제외한 그래프를 생성하여 반환하는 FilterEdges 메소드
-    Graph FilterEdges(const std::string& requiredAttribute) {   
+    Graph FilterEdges(const std::string& requiredAttribute) {
         Graph newGraph;
         newGraph.nodes = nodes;
 
@@ -116,7 +116,7 @@ public:
     }
 
     //그래프 내에 특정 이름을 가진 노드가 있으면 true, 없으면 false를 반환해주는 NodeExists 메소드
-    bool NodeExists(const std::string& name) {      
+    bool NodeExists(const std::string& name) {
         for (const Node& node : nodes) {
             if (node.name == name) {
                 return true;
@@ -126,16 +126,16 @@ public:
     }
 
     //Astar 알고리즘
-    std::pair<std::vector<int>, std::vector<int>> AStar(const Node& start, const Node& end);   
+    std::pair<std::vector<int>, std::vector<int>> AStar(const Node& start, const Node& end);
 };
 
 //AStar의 결과인 prev 벡터를 가져와서 도착 노드부터 지나온 노드들을 거꾸로 돌아오면서 시작 노드까지 노드의 이름을 string 벡터 path에 저장(reverse를 사용해서 순서대로 저장)
-std::vector<std::string> ReconstructPath(const std::vector<int>& prev, const std::vector<Node>& nodes, int startIndex, int endIndex) {
-    std::vector<std::string> path;
+std::vector<Node> ReconstructPath(const std::vector<int>& prev, const std::vector<Node>& nodes, int startIndex, int endIndex) {
+    std::vector<Node> path;
     int currentNode = endIndex;
 
     while (currentNode != startIndex) {
-        path.push_back(nodes[currentNode].name);
+        path.push_back(nodes[currentNode]);
         currentNode = prev[currentNode];
         if (currentNode == -1) {
             break;
@@ -143,7 +143,7 @@ std::vector<std::string> ReconstructPath(const std::vector<int>& prev, const std
     }
 
     if (currentNode == startIndex) {
-        path.push_back(nodes[startIndex].name);
+        path.push_back(nodes[startIndex]);
     }
 
     std::reverse(path.begin(), path.end());
@@ -184,9 +184,9 @@ std::pair<std::vector<int>, std::vector<int>> Graph::AStar(const Node& start, co
         for (const Edge& edge : edges) {
             if (edge.node1.name == nodes[current_node].name || edge.node2.name == nodes[current_node].name) {  //edges를 돌며 현재 노드에 연결된 엣지를 찾아 다음 노드를 선정한다.
                 int next_node;
-                if(edge.node1.name == nodes[current_node].name)
+                if (edge.node1.name == nodes[current_node].name)
                     next_node = FindNodeIndex(nodes, edge.node2.name);
-                if(edge.node2.name == nodes[current_node].name)
+                if (edge.node2.name == nodes[current_node].name)
                     next_node = FindNodeIndex(nodes, edge.node1.name);
                 int candidate_dist = dist[current_node] + edge.weight;                                         //연결된 엣지 반대편 노드까지의 거리에 현재 노드까지의 총 거리를 더해 총 거리를 업데이트한다.
 
@@ -206,21 +206,21 @@ int main() {
     Graph graph;
 
     // AddEdges (자동으로 노드 추가)
-    graph.AddEdge("다향관", 0, 0, "명진관", 0, 0, 100, "평지", "차도");
-    graph.AddEdge("명진관", 0, 0, "과학관", 0, 0, 30, "평지", "차도");
-    graph.AddEdge("과학관", 0, 0, "대운동장앞", 0, 0, 20, "평지", "차도");
-    graph.AddEdge("명진관", 0, 0, "법학관", 0, 0, 70, "평지", "차도");
-    graph.AddEdge("다향관", 0, 0, "법학관", 0, 0, 70, "평지", "차도");
-    graph.AddEdge("법학관", 0, 0, "혜화관", 0, 0, 50, "평지", "차도");
-    graph.AddEdge("법학관", 0, 0, "대운동장앞", 0, 0, 170, "평지", "차도");
-    graph.AddEdge("대운동장앞", 0, 0, "경영관", 0, 0, 200, "평지", "차도");
-    graph.AddEdge("대운동장앞", 0, 0, "사회과학관", 0, 0, 220, "평지", "차도");
-    graph.AddEdge("대운동장앞", 0, 0, "혜화관", 0, 0, 80, "평지", "차도");
-    graph.AddEdge("경영관", 0, 0, "사회과학관", 0, 0, 10, "평지", "도보");
-    graph.AddEdge("사회과학관", 0, 0, "혜화관", 0, 0, 30, "평지", "차도");
-    graph.AddEdge("혜화관", 0, 0, "문화관", 0, 0, 45, "평지", "도보");
-    graph.AddEdge("사회과학관", 0, 0, "문화관", 0, 0, 20, "평지", "도보");
-    graph.AddEdge("문화관", 0, 0, "학술관", 0, 0, 20, "평지", "도보");
+    graph.AddEdge("다향관", 0, 0, "명진관", 1, 1, 100, "평지", "차도");
+    graph.AddEdge("명진관", 1, 1, "과학관", 2, 2, 30, "평지", "차도");
+    graph.AddEdge("과학관", 2, 2, "대운동장앞", 3, 3, 20, "평지", "차도");
+    graph.AddEdge("명진관", 1, 1, "법학관", 4, 4, 70, "평지", "차도");
+    graph.AddEdge("다향관", 0, 0, "법학관", 4, 4, 70, "평지", "차도");
+    graph.AddEdge("법학관", 4, 4, "혜화관", 5, 5, 50, "평지", "차도");
+    graph.AddEdge("법학관", 4, 4, "대운동장앞", 3, 3, 170, "평지", "차도");
+    graph.AddEdge("대운동장앞", 3, 3, "경영관", 6, 6, 200, "평지", "차도");
+    graph.AddEdge("대운동장앞", 3, 3, "사회과학관", 7, 7, 220, "평지", "차도");
+    graph.AddEdge("대운동장앞", 3, 3, "혜화관", 5, 5, 80, "평지", "차도");
+    graph.AddEdge("경영관", 6, 6, "사회과학관", 7, 7, 10, "평지", "도보");
+    graph.AddEdge("사회과학관", 7, 7, "혜화관", 5, 5, 30, "평지", "차도");
+    graph.AddEdge("혜화관", 5, 5, "문화관", 8, 8, 45, "평지", "도보");
+    graph.AddEdge("사회과학관", 7, 7, "문화관", 8, 8, 20, "평지", "도보");
+    graph.AddEdge("문화관", 8, 8, "학술관", 9, 9, 20, "평지", "도보");
 
     std::string startNodeName = "과학관";
     std::string endNodeName = "사회과학관";
@@ -236,13 +236,31 @@ int main() {
     std::vector<int> regularDist = regularResult.first;
     std::vector<int> regularPrev = regularResult.second;
 
-    std::vector<std::string> regularPath = ReconstructPath(regularPrev, graph.nodes, startIndex, endIndex);
+    std::vector<Node> startPoints;
+    std::vector<Node> endPoints;
+    std::vector<Node> regularPath = ReconstructPath(regularPrev, graph.nodes, startIndex, endIndex);
 
     std::cout << "Regular path from " << startNode << " to " << endNode << ":\n";
-    for (const std::string& node : regularPath) {
+    for (int i = 0; i < regularPath.size(); i++) {
+        if (i == 0)
+            startPoints.push_back(regularPath[i]);
+        else if(i == regularPath.size() - 1)
+            endPoints.push_back(regularPath[i]);
+        else {
+            endPoints.push_back(regularPath[i]);
+            startPoints.push_back(regularPath[i]);
+        }
+    }
+
+    for (int i = 0; i < startPoints.size(); i++) {
+        std::cout << "(" << startPoints[i].x << ", " << startPoints[i].y << ")" << " -> " << "(" << endPoints[i].x << ", " << endPoints[i].y << ")" << std::endl;
+    }
+
+    for (const Node& node : regularPath) {
         std::cout << node << " -> ";
     }
     std::cout << "END\n\n";
+
     std::cout << "Total distance: " << regularDist[endIndex] << std::endl;
 
     // No stairs search
@@ -250,10 +268,10 @@ int main() {
     auto noStairsResult = noStairsGraph.AStar(startNode, endNode);
     std::vector<int> noStairsDist = noStairsResult.first;
     std::vector<int> noStairsPrev = noStairsResult.second;
-    std::vector<std::string> noStairsPath = ReconstructPath(noStairsPrev, noStairsGraph.nodes, startIndex, endIndex);
+    std::vector<Node> noStairsPath = ReconstructPath(noStairsPrev, noStairsGraph.nodes, startIndex, endIndex);
 
     std::cout << "\nPath without stairs from " << startNode << " to " << endNode << ":\n";
-    for (const std::string& node : noStairsPath) {
+    for (const Node& node : noStairsPath) {
         std::cout << node << " -> ";
     }
     std::cout << "END\n\n";
@@ -264,10 +282,10 @@ int main() {
     auto noElevatorsResult = noElevatorsGraph.AStar(startNode, endNode);
     std::vector<int> noElevatorsDist = noElevatorsResult.first;
     std::vector<int> noElevatorsPrev = noElevatorsResult.second;
-    std::vector<std::string> noElevatorsPath = ReconstructPath(noElevatorsPrev, noElevatorsGraph.nodes, startIndex, endIndex);
+    std::vector<Node> noElevatorsPath = ReconstructPath(noElevatorsPrev, noElevatorsGraph.nodes, startIndex, endIndex);
 
     std::cout << "\nPath without elevators from " << startNode << " to " << endNode << ":\n";
-    for (const std::string& node : noElevatorsPath) {
+    for (const Node& node : noElevatorsPath) {
         std::cout << node << " -> ";
     }
     std::cout << "END\n\n";
@@ -279,10 +297,10 @@ int main() {
     auto roadOnlyResult = roadOnlyGraph.AStar(startNode, endNode);
     std::vector<int> roadOnlyDist = roadOnlyResult.first;
     std::vector<int> roadOnlyPrev = roadOnlyResult.second;
-    std::vector<std::string> roadOnlyPath = ReconstructPath(roadOnlyPrev, roadOnlyGraph.nodes, startIndex, endIndex);
+    std::vector<Node> roadOnlyPath = ReconstructPath(roadOnlyPrev, roadOnlyGraph.nodes, startIndex, endIndex);
 
     std::cout << "\nPath with road only from " << startNode << " to " << endNode << ":\n";
-    for (const std::string& node : roadOnlyPath) {
+    for (const Node& node : roadOnlyPath) {
         std::cout << node << " -> ";
     }
     std::cout << "END\n\n";
@@ -290,4 +308,3 @@ int main() {
 
     return 0;
 }
-
